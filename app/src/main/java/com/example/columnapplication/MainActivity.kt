@@ -1,6 +1,7 @@
 package com.example.columnapplication
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -8,7 +9,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,17 +17,22 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,18 +45,58 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            app()
+            ColumnApplicationTheme {
+                ViewContainer()
+            }
         }
     }
 }
 
 @Preview
 @Composable
-fun app() {
-    var counter by rememberSaveable { mutableStateOf(0)}
+fun ViewContainer() {
+    Scaffold(
+        topBar = { Toolbar() }, // <-- Se agregó la coma aquí
+        floatingActionButton = { FAB() },
+        floatingActionButtonPosition = FabPosition.End
+    ) { innerPadding ->
+        Content(paddingValues = innerPadding)
+    }
+}
+
+@Composable
+fun FAB() {
+    val context = LocalContext.current
+    FloatingActionButton(onClick = {
+        Toast.makeText(context, "Hola", Toast.LENGTH_SHORT).show() // <-- Se usó 'context' en vez de 'this'
+    }) {
+        Text("X")
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Toolbar() {
+    TopAppBar(
+        title = {
+            Text(
+                text = "Karina BL",
+                color = colorResource(id = R.color.white)
+            )
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = colorResource(id = R.color.background)
+        )
+    )
+}
+
+@Composable
+fun Content(paddingValues: PaddingValues = PaddingValues(0.dp)) {
+    var counter by rememberSaveable { mutableStateOf(0) }
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
+            .padding(paddingValues)
             .background(Color.Magenta)
     ) {
         item {
@@ -65,9 +111,13 @@ fun app() {
                 Image(
                     painter = painterResource(id = R.drawable.ic_favorite),
                     contentDescription = "Like",
-                    modifier = Modifier.clickable{ counter++ }
+                    modifier = Modifier.clickable { counter++ }
                 )
-                Text(text = counter.toString(), color = Color.White, modifier = Modifier.padding(start = 14.dp))
+                Text(
+                    text = counter.toString(),
+                    color = Color.White,
+                    modifier = Modifier.padding(start = 14.dp)
+                )
             }
             Text(
                 text = "Karina LB",
